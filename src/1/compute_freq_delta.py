@@ -2,9 +2,9 @@
 # Day 1 of the Advent of Code
 # https://adventofcode.com/2018/day/1
 #
-# From a list of frequency deltas df_i, compute the final frequency f = sum(df_i)
+# part 1) From a list of frequency deltas df_i, compute the final frequency f = sum(df_i)
+# part 2) Find the first repeated frequency, repeating the same delta sequence
 #
-
 
 def read_input(file_path):
 ### open file and read deltas
