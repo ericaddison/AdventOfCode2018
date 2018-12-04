@@ -1,6 +1,6 @@
 #
 # Day 2 of the Advent of Code
-# https://adventofcode.com/2018/day/1
+# https://adventofcode.com/2018/day/2
 #
 # part 1) From a list of inventory ids, compute a checksum as: 
 #   (number of ids with a character repeated twice) * (number of ids with a character repeated three times)
