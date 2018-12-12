@@ -8,6 +8,7 @@ def power_level(x, y, grid_serial):
   rack_id = get_rack_id(x)
   return (((((rack_id * y) + grid_serial) * rack_id) // 100) % 10) - 5
 
+
 def total_power_dynamic(x, y, size, power_table):
   tot_pow = power_table[(x, y, size-1)]
   for ix in range(x, x+size):
@@ -17,6 +18,7 @@ def total_power_dynamic(x, y, size, power_table):
     tot_pow = tot_pow + power_table[(x+size-1, iy, 1)]
 
   return tot_pow
+
 
 def main():
   grid_serial = 6392
