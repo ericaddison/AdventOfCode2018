@@ -8,6 +8,7 @@ class Cart:
     self.turn_index = 0
     self.location = location
     self.direction = direction
+    self.crashed = False
 
   def intersection_turn(self):
     turn_index = -1 + (self.turn_index%3)
@@ -51,11 +52,14 @@ def print_track(track, carts):
 
 
 def move_cart(track, cart):
+  if cart.crashed:
+    return
+
   x = cart.location[0]
   y = cart.location[1]
   current_track = track[y][x]
 
-  print('cart at location {} with direction {} is on a {}'.format(cart.location, cart.direction, current_track))
+  #print('cart at location {} with direction {} is on a {}'.format(cart.location, cart.direction, current_track))
 
   # move the cart
   if cart.direction == '^':
@@ -67,7 +71,7 @@ def move_cart(track, cart):
   elif cart.direction == '>':
     cart.location = (x+1, y) 
 
-  print('new location is ', cart.location)
+  #print('new location is ', cart.location)
 
   # turn if necessary
   x = cart.location[0]
@@ -82,40 +86,56 @@ def move_cart(track, cart):
   elif next_track == '+':
     cart.intersection_turn()
       
-  print('new track piece is {}, so new direction is {}'.format(next_track, cart.direction))
-  print('')
+  #print('new track piece is {}, so new direction is {}'.format(next_track, cart.direction))
+  #print('')
 
-def check_for_collisions(track, cart, all_carts):
+def mark_collisions(track, cart, all_carts):
   collisions = [c2 for c2 in all_carts if c2!=cart and c2.location == cart.location]
   if len(collisions) > 0:
-    return collisions[0].location
-  return None   
+    cart.crashed = True
+    for c2 in collisions:
+      c2.crashed = True
 
     
 def move_carts(track, carts):
+  collisions = []
   for cart in carts:
     move_cart(track, cart)  
-    collision_location = check_for_collisions(track, cart, carts) 
-    if collision_location:
-      return collision_location
-  return None
+    mark_collisions(track, cart, carts) 
 
 def main():
-  track, carts = read_input('./input/track.dat')
+
+  infile = './input/track.dat'
+
+  # part 1
+  track, carts = read_input(infile)
   #print_track(track, carts)
 
   tick = 1
   while(True):
-    print("TICK ", tick)
+    #print("TICK ", tick)
     carts = sorted(carts, key=lambda cart: (cart.location[1], cart.location[0]))
-    possible_collision_location = move_carts(track, carts)
-    if possible_collision_location:
-      print("first collision found at location:", possible_collision_location)
+    move_carts(track, carts)
+    crashes = [cart for cart in carts if cart.crashed]
+    if crashes:
+      crash_locations = set([cart.location for cart in crashes])
+      print("part 1: first collision found at location:", crash_locations)
       break  
-    print("-------------------------\n\n")
+    #print("-------------------------\n\n")
     tick = tick + 1
     #print_track(track, carts)
   
+
+  # part 2
+  track, carts = read_input(infile)
+  while(len(carts)>1):
+    carts = sorted(carts, key=lambda cart: (cart.location[1], cart.location[0]))
+    move_carts(track, carts)
+    crashes = [cart for cart in carts if cart.crashed]
+    if crashes:
+        carts = [cart for cart in carts if not cart.crashed]
+
+  print('part 2: location of last cart:', carts[0].location)
 
 if __name__== "__main__":
   main()
