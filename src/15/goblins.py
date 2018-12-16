@@ -27,16 +27,29 @@ def read_input(path):
   return the_map, walls, players
 
 
-def find_in_range_spaces(the_map, enemies, my_loc):
+def find_in_range_spaces(the_map, enemies):
   in_range_map = {}         # key = open map location, value = enemy location
   for enemy_loc in enemies:
     for direction in directions:
       adjacent = add_tuples(enemy_loc, direction)
       map_char = the_map[adjacent[0]][adjacent[1]]
-      if map_char == empty_char or adjacent == my_loc:
+      if map_char == empty_char:
         in_range_map[adjacent] = enemy_loc
   return in_range_map
 
+
+def find_adjacent_enemies(my_loc, enemy_locations):
+  adjacent_enemies = []
+  if (my_loc[0]+1, my_loc[1]) in enemy_locations:
+    adjacent_enemies.append((my_loc[0]+1, my_loc[1]))
+  if (my_loc[0]-1, my_loc[1]) in enemy_locations:
+    adjacent_enemies.append((my_loc[0]-1, my_loc[1]))
+  if (my_loc[0], my_loc[1]+1) in enemy_locations:
+    adjacent_enemies.append((my_loc[0], my_loc[1]+1))
+  if (my_loc[0], my_loc[1]-1) in enemy_locations:
+    adjacent_enemies.append((my_loc[0], my_loc[1]-1))
+  return adjacent_enemies
+    
 
 def find_path_to_closest_in_range_space(the_map, my_loc, in_range_spaces):
   """ find the shortest distance to all in-range locations from my_loc"""  
@@ -88,25 +101,28 @@ def do_round(the_map, players):
     loc = player[0]
     player_type = player[1]
     if player_type == elf_char:
-      enemies = get_enemy_locations(players, goblin_char)
+      enemy_locs = get_enemy_locations(players, goblin_char)
     else:
-      enemies = get_enemy_locations(players, elf_char)
+      enemy_locs = get_enemy_locations(players, elf_char)
 
-    print('-- enemy locations: ', enemies)
+    print('-- enemy locations: ', enemy_locs)
 
-    in_range_spaces = find_in_range_spaces(the_map, enemies, loc)
-    print('-- in range spaces ', in_range_spaces)
-    in_range = loc in in_range_spaces.keys()
+    in_range_spaces = find_in_range_spaces(the_map, enemy_locs)
+    adjacent_enemies = find_adjacent_enemies(loc, enemy_locs)
+    in_range = adjacent_enemies
     print('-- in range? ', in_range)
 
     if in_range: #attack!
-      pass
+      print('Attack!!!')
     else: #move!
       shortest_path = find_path_to_closest_in_range_space(the_map, loc, in_range_spaces)
       print('shortest path ', shortest_path)
       next_move = shortest_path[0] if shortest_path else loc
       print('-- moving to ', next_move)
-      move_player(player, next_move, the_map)     
+      move_player(player, next_move, the_map)
+      adjacent_enemies = find_adjacent_enemies(next_move, enemy_locs)
+      in_range = adjacent_enemies
+      print('-- in range now? ', in_range)
 
 
 def main():
